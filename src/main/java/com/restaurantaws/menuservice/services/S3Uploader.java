@@ -1,5 +1,7 @@
 package com.restaurantaws.menuservice.services;
 
+import com.google.gson.Gson;
+import com.restaurantaws.menuservice.model.Menu;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -7,8 +9,12 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 public class S3Uploader {
 
+    private static final Gson gson = new Gson();
 
-    public static void uploadJsonToS3(String bucketName, String key, String jsonObject ){
+    public static void uploadToS3(Menu menu){
+        String bucketName = "menudatabase-menu";
+        String key = "menu" + menu.getMenuVersion() + ".json";
+        String jsonObject = gson.toJson(menu);
 
         S3Client s3Client = S3ClientFactory.createS3Client();
 

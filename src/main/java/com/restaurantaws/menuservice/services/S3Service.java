@@ -7,16 +7,8 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 public class S3Service {
 
     public void saveToS3(Menu menu){
-        String bucketName = "menudatabase-menu";
-        String menuKey = "menu.json";
-        String jsonObject = new Gson().toJson(menu);
-
         try{
-            S3Uploader.uploadJsonToS3(bucketName, menuKey, jsonObject);
-
-        }catch (NoSuchKeyException e){
-            Menu newMenu = menu;
-            S3Uploader.uploadJsonToS3(bucketName, menuKey, new Gson().toJson(newMenu));
+            S3Uploader.uploadToS3(menu);
         }catch (Exception e){
             throw new RuntimeException("Error while saving data to S3: " + e.getMessage());
         }

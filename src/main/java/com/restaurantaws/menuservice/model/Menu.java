@@ -1,10 +1,11 @@
 package com.restaurantaws.menuservice.model;
 
-
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 import java.util.List;
 
-
+@DynamoDBTable(tableName = "MenuTable")
 public class Menu {
 
     private double menuVersion;
@@ -13,25 +14,25 @@ public class Menu {
     private List<Dish> dishes;
     private List<Drink> drinks;
     private List<AddOn> addsOn;
-//    private String timestamp;
+
+    private Category category;
     private long timestamp;
 
     public Menu() {
         this.menuVersion = 1;
-        incrementMenuVersion();
     }
 
-        public Menu(double menuVersion, String date, String token, List<Dish> dishes, List<Drink> drinks, List<AddOn> addsOn, long timestamp) {
-            this.menuVersion = 1;
-            this.date = date;
-            this.token = token;
-            this.dishes = dishes;
-            this.drinks = drinks;
-            this.addsOn = addsOn;
-            this.timestamp = timestamp;
-            incrementMenuVersion();
-        }
+    public Menu(double menuVersion, String date, String token, List<Dish> dishes, List<Drink> drinks, List<AddOn> addsOn, long timestamp) {
+        this.menuVersion = menuVersion;
+        this.date = date;
+        this.token = token;
+        this.dishes = dishes;
+        this.drinks = drinks;
+        this.addsOn = addsOn;
+        this.timestamp = timestamp;
+    }
 
+    @DynamoDBAttribute
     public List<Dish> getDishes() {
         return dishes;
     }
@@ -40,6 +41,7 @@ public class Menu {
         this.dishes = dishes;
     }
 
+    @DynamoDBAttribute
     public List<Drink> getDrinks() {
         return drinks;
     }
@@ -48,6 +50,7 @@ public class Menu {
         this.drinks = drinks;
     }
 
+    @DynamoDBAttribute
     public List<AddOn> getAddsOn() {
         return addsOn;
     }
@@ -56,7 +59,7 @@ public class Menu {
         this.addsOn = addsOn;
     }
 
-
+    @DynamoDBAttribute
     public double getMenuVersion() {
         return menuVersion;
     }
@@ -65,7 +68,7 @@ public class Menu {
         this.menuVersion = menuVersion;
     }
 
-
+    @DynamoDBAttribute
     public String getDate() {
         return date;
     }
@@ -74,7 +77,7 @@ public class Menu {
         this.date = date;
     }
 
-
+    @DynamoDBAttribute
     public String getToken() {
         return token;
     }
@@ -83,15 +86,24 @@ public class Menu {
         this.token = token;
     }
 
-
-    public Long getTimestamp() {
+    @DynamoDBAttribute
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Long timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
+
     public void incrementMenuVersion() {
         this.menuVersion += 0.1;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Category getCategory() {
+        return category;
     }
 }
