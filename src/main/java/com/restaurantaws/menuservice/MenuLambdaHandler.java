@@ -124,6 +124,7 @@ public class MenuLambdaHandler implements RequestHandler<APIGatewayProxyRequestE
             menuDatabaseService.saveData(menu);
 
 
+
         } catch (Exception e){
             logger.log("Error while setting menu fields: " + e);
             return createErrorResponse(500, "Error while setting menu fields: " + e.getMessage());
