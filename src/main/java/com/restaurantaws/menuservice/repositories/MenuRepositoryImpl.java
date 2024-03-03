@@ -1,5 +1,6 @@
 package com.restaurantaws.menuservice.repositories;
 
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
@@ -16,8 +17,8 @@ public class MenuRepositoryImpl implements MenuRepository{
 
     private final Table menuTable;
 
-    public MenuRepositoryImpl(Table menuTable) {
-        this.menuTable = menuTable;
+    public MenuRepositoryImpl(DynamoDB dynamodb) {
+        this.menuTable = dynamodb.getTable("MenuTable");
     }
     @Override
     public void saveMenu(Menu menu) {

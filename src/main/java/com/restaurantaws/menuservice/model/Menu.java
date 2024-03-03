@@ -31,6 +31,15 @@ public class Menu {
         this.addsOn = addsOn;
         this.timestamp = timestamp;
     }
+    public Menu(String date, String token, List<Dish> dishes, List<Drink> drinks, List<AddOn> addsOn, long timestamp) {
+        this.menuVersion = 1.0;
+        this.date = date;
+        this.token = token;
+        this.dishes = dishes;
+        this.drinks = drinks;
+        this.addsOn = addsOn;
+        this.timestamp = timestamp;
+    }
 
     @DynamoDBAttribute
     public List<Dish> getDishes() {
@@ -105,5 +114,18 @@ public class Menu {
 
     public Category getCategory() {
         return category;
+    }
+
+    public String toString() {
+        return "Menu{" +
+                "menuVersion=" + menuVersion +
+                ", date='" + date + '\'' +
+                ", token='" + token + '\'' +
+                ", dishes=" + dishes +
+                ", drinks=" + drinks +
+                ", addsOn=" + addsOn +
+                ", category=" + category +
+                ", timestamp=" + timestamp +
+                '}';
     }
 }

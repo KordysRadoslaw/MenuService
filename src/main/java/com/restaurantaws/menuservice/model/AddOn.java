@@ -98,4 +98,7 @@ public class AddOn {
             return false;
         }
     }
+    public String toString(){
+        return "AddOn: " + name + " " + description + " " + price + " " + type;
+    }
 }

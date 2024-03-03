@@ -101,4 +101,7 @@ public class Dish {
             return false;
         }
     }
+    public String toString(){
+        return "Dish: " + name + " Price: " + price;
+    }
 }

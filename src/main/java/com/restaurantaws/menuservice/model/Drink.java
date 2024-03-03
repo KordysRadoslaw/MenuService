@@ -101,4 +101,7 @@ public class Drink {
             return false;
         }
     }
+    public String toString(){
+        return "Drink: " + name + " " + description + " " + price + " " + type;
+    }
 }
