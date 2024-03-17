@@ -1,35 +1,24 @@
 package com.restaurantaws.menuservice;
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
-import com.restaurantaws.menuservice.model.AddOn;
-import com.restaurantaws.menuservice.model.Dish;
-import com.restaurantaws.menuservice.model.Drink;
 import com.restaurantaws.menuservice.model.Menu;
 import com.restaurantaws.menuservice.repositories.MenuRepository;
 import com.restaurantaws.menuservice.repositories.MenuRepositoryImpl;
 import com.restaurantaws.menuservice.services.*;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -40,32 +29,40 @@ public class MenuLambdaHandler implements RequestHandler<APIGatewayProxyRequestE
     private final GenerateToken generateToken;
     private static final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().region(Region.EU_WEST_1).build();
 
+    private final MenuFormatter menuFormatter;
+
     private final MenuRepository menuRepository;
     private static final String TABLE_NAME = "MenuTable";
+    private static final Region AWS_REGION = Region.EU_WEST_1;
 
 
 
-    public MenuLambdaHandler(DynamoDBService menuDatabaseService, GenerateToken generateToken, MenuRepository menuRepository) {
+    public MenuLambdaHandler(DynamoDBService menuDatabaseService, GenerateToken generateToken, MenuRepository menuRepository, MenuFormatter menuFormatter) {
         this.menuDatabaseService = menuDatabaseService;
         this.generateToken = generateToken;
         this.menuRepository = menuRepository;
+        this.menuFormatter = menuFormatter;
     }
 
     public MenuLambdaHandler() {
         Cache<String, Menu> asyncCache = new AsyncCache<>();
         DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
-                .region(Region.EU_WEST_1)
+                .region(AWS_REGION)
                 .build();
 
+        this.menuFormatter = new MenuFormatter();
+        AmazonDynamoDB amazonDynamoDBClient = AmazonDynamoDBClientBuilder.standard()
+                .withRegion(AWS_REGION.id())
+                .build();
 
-        AmazonDynamoDB amazonDynamoDBClient = AmazonDynamoDBClientBuilder.defaultClient();
+        this.menuDatabaseService = new DynamoDBService(dynamoDbClient, TABLE_NAME, asyncCache,
+                new MenuRepositoryImpl(new DynamoDB(amazonDynamoDBClient)), new MenuFormatter(),
+                new S3Service(), new S3Uploader(), new GenerateToken());
 
-        this.menuDatabaseService = new DynamoDBService(dynamoDbClient, TABLE_NAME, asyncCache, new MenuRepositoryImpl(new DynamoDB(amazonDynamoDBClient)), new MenuFormatter(), new S3Service(), new S3Uploader(), new GenerateToken());
         this.generateToken = new GenerateToken();
         this.menuRepository = new MenuRepositoryImpl(new DynamoDB(amazonDynamoDBClient));
-
+        menuDatabaseService.scheduleCacheRefresh();
     }
-
 
 
     @Override
@@ -90,40 +87,18 @@ public class MenuLambdaHandler implements RequestHandler<APIGatewayProxyRequestE
         long timestamp = System.currentTimeMillis();
         Gson gson = new Gson();
         logger.log("requestBody after: " + requestBody);
-        //Menu menu = gson.fromJson(requestBody, Menu.class);
-        JsonObject jsonObject = gson.fromJson(requestBody, JsonObject.class);
-
+        Menu menu = gson.fromJson(requestBody, Menu.class);
 
         String token = generateToken.generateUniqueToken();
-        //double menuVersion = jsonObject.get("menuVersion").getAsDouble();
-        double menuVersion = 1.0;
+
+        menu.incrementMenuVersion();
+
         String date = currentDateTime.format(formatter);
-        //String token = jsonObject.get("token").getAsString();
-        //long timestamp = jsonObject.get("timestamp").getAsLong();
-
-        Type dishListType = new TypeToken<List<Dish>>() {}.getType();
-        List<Dish> dishes = gson.fromJson(jsonObject.getAsJsonArray("dishes"), dishListType);
-
-// Parsowanie listy napojów
-        Type drinkListType = new TypeToken<List<Drink>>() {}.getType();
-        List<Drink> drinks = gson.fromJson(jsonObject.getAsJsonArray("drinks"), drinkListType);
-
-// Parsowanie listy dodatków
-        Type addOnListType = new TypeToken<List<AddOn>>() {}.getType();
-        List<AddOn> addsOn = gson.fromJson(jsonObject.getAsJsonArray("addsOn"), addOnListType);
 
         try{
-            Menu menu = new Menu(menuVersion, date, token, dishes, drinks, addsOn, timestamp);
-            logger.log("menu: " + menu.toString());
-            logger.log("menu" + menu);
-            Menu menu1 = new Menu(date, token, dishes, drinks, addsOn, timestamp);
-            logger.log("menu1: " + menu1.toString());
-            logger.log("menu1" + menu1);
-            //tutaj bedzie zapis do bazy
-            logger.log("to byloby zapisane menu: " + menu.toString());
-            menuDatabaseService.saveData(menu);
-
-
+            Menu formattedMenu = menuFormatter.formatMenu(menu);
+            logger.log("Formatted menu: " + formattedMenu);
+            menuDatabaseService.saveData(formattedMenu);
 
         } catch (Exception e){
             logger.log("Error while setting menu fields: " + e);
@@ -167,7 +142,7 @@ public class MenuLambdaHandler implements RequestHandler<APIGatewayProxyRequestE
 
                 return response;
             } catch (Exception e) {
-                logger.log("Error while loading menu: " + e);
+                logger.log("Error while loadiing menu: " + e.getMessage());
                 return createErrorResponse(500, "Error while loading menu: " + e.getMessage());
             }
         } else {

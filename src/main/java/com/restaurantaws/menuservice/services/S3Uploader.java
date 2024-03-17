@@ -13,7 +13,8 @@ public class S3Uploader {
 
     public static void uploadToS3(Menu menu){
         String bucketName = "menudatabase-menu";
-        String key = "menu" + menu.getMenuVersion() + ".json";
+        String key = String.format("menu%.1f.json", menu.getMenuVersion());
+        System.out.println("menuV: " + menu.getMenuVersion());
         String jsonObject = gson.toJson(menu);
 
         S3Client s3Client = S3ClientFactory.createS3Client();

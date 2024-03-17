@@ -8,7 +8,7 @@ public class Dish {
 
     private String dishId;
 
-    private int categoryId = 2;
+    private String category = "Dish";
     private String name;
     private String price;
     private String type;
@@ -21,18 +21,18 @@ public class Dish {
     }
 
 
-    public Dish(String dishId, int categoryId, String name, String price, String type, String description) {
+    public Dish(String dishId, String category, String name, String price, String type, String description) {
         this.dishId = dishId;
-        this.categoryId = categoryId;
+        this.category = category;
         this.name = name;
         this.price = price;
         this.type = type;
         this.description = description;
     }
 
-    public Dish(int categoryId, String name, String price, String type, String description) {
+    public Dish(String category, String name, String price, String type, String description) {
         this.dishId = generateUniqueToken();
-        this.categoryId = categoryId;
+        this.category = category;
         this.name = name;
         this.price = price;
         this.type = type;
@@ -83,8 +83,8 @@ public class Dish {
         this.description = description;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public String getCategory() {
+        return category;
     }
 
     private String generateUniqueToken() {

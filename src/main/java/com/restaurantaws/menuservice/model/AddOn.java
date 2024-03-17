@@ -7,7 +7,7 @@ import java.util.Base64;
 public class AddOn {
     private String addOnId;
 
-    private int categoryId = 1;
+    private String category = "AddOn";
     private String name;
 
     private String description;
@@ -18,17 +18,17 @@ public class AddOn {
         this.addOnId = generateUniqueToken();
     }
 
-    public AddOn(String addOnId, int categoryId, String name, String description, String price, String type) {
+    public AddOn(String addOnId, String category, String name, String description, String price, String type) {
         this.addOnId = addOnId;
-        this.categoryId = categoryId;
+        this.category = category;
         this.name = name;
         this.description = description;
         this.price = price;
         this.type = type;
     }
-    public AddOn(int categoryId, String name, String description, String price, String type) {
+    public AddOn(String category, String name, String description, String price, String type) {
         this.addOnId = generateUniqueToken();
-        this.categoryId = categoryId;
+        this.category = category;
         this.name = name;
         this.description = description;
         this.price = price;
@@ -79,8 +79,8 @@ public class AddOn {
         this.type = type;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public String getCategory() {
+        return category;
     }
 
     private String generateUniqueToken() {

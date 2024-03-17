@@ -18,4 +18,9 @@ public class AsyncCache<K, V> implements Cache<K, V> {
     public void put(K key, V value) {
         executorService.submit(() -> cache.put(key, value));
     }
+
+    @Override
+    public void remove(K key) {
+        executorService.submit(() -> cache.remove(key));
+    }
 }

@@ -1,17 +1,11 @@
 package com.restaurantaws.menuservice.services;
 
-import com.restaurantaws.menuservice.model.Dish;
-import com.restaurantaws.menuservice.model.Drink;
-import com.restaurantaws.menuservice.model.AddOn;
 import com.restaurantaws.menuservice.model.Menu;
 import com.restaurantaws.menuservice.repositories.MenuRepository;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.*;
-
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class DynamoDBService {
 
@@ -30,7 +24,10 @@ public class DynamoDBService {
 
     private S3Uploader s3Uploader;
 
-    private GenerateToken generateToken;
+    private final GenerateToken generateToken;
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
 
     public DynamoDBService(DynamoDbClient ddbClient, String tableName,Cache<String, Menu> menuCache, MenuRepository menuRepository, MenuFormatter menuFormatter, S3Service s3Service, S3Uploader s3Uploader, GenerateToken generateToken) {
         this.tableName = tableName;
@@ -43,39 +40,10 @@ public class DynamoDBService {
         this.menuCache = menuCache;
     }
 
-
-
-
-
-//    public DynamoDBService(DynamoDbClient ddbClient, String tableName, MenuCache menuCache, MenuProcessor menuProcessor, S3Service s3Service) {
-//        this.tableName = tableName;
-//        this.ddbClient = ddbClient;
-//        this.menuCache = menuCache;
-//        this.menuProcessor = menuProcessor;
-//        this.s3Service = s3Service;
-//    }
-
-//    public boolean saveData(Menu menu) {
-//
-//        Map<String, AttributeValue> itemValues = menuProcessor.menuProcessor(menu);
-//
-//        try {
-//            ddbClient.putItem(PutItemRequest.builder().tableName(tableName).item(itemValues).build());
-//            s3Service.saveToS3(menu);
-//
-//            return true;
-//        } catch (DynamoDbException e) {
-//            throw new RuntimeException("DynamoDB exception: " + e.getMessage(), e);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error while saving data to DynamoDB: " + e.getMessage(), e);
-//        }
-//    }
-
     public boolean saveData(Menu menu){
-        //tutaj gdzies ten formatter trzeba uzyc
         Menu formattedMenu = menuFormatter.formatMenu(menu);
-        // a tu zapisywnaie
         try{
+            //kurwa tu gdzies jest blad
             menuRepository.saveMenu(formattedMenu);
             s3Uploader.uploadToS3(formattedMenu);
             return true;
@@ -85,99 +53,66 @@ public class DynamoDBService {
     }
 
     public Menu loadLatestMenuFromDatabase() {
-//        String cacheKey = "latestMenu";
-//        long currentTimeMillis = System.currentTimeMillis();
-//        String timestamString = Long.toString(currentTimeMillis);
-//        Menu cachedMenu = menuCache.getMenu(cacheKey, currentTimeMillis);
-//        if (cachedMenu != null) {
-//            return cachedMenu;
-//        }
-//
-//        LocalDateTime currentDateTime = LocalDateTime.now();
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        String formattedDateTime = currentDateTime.format(formatter);
-//
-//        // the map with a filter
-//        Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-//        expressionAttributeValues.put(":menuDate", AttributeValue.builder().s(formattedDateTime).build());
-//
-//        // scan
-//        ScanRequest scanRequest = ScanRequest.builder()
-//                .tableName(tableName)
-//                .filterExpression("menuDate = :menuDate")
-//                .expressionAttributeValues(expressionAttributeValues)
-//                .build();
-//
-//
-//        try {
-//            ScanResponse response = ddbClient.scan(scanRequest);
-//
-//            if (!response.items().isEmpty()) {
-//                Map<String, AttributeValue> firstItem = response.items().get(0);
-//                double menuVersion = Double.parseDouble(firstItem.get("menuVersion").n());
-//                String tokenId = generateToken.generateUniqueToken();
-//
-//                List<Dish> dishes = getDishesFromMap(firstItem);
-//                List<Drink> drinks = getDrinksFromMap(firstItem);
-//                List<AddOn> addsOn = getAddsOnFromMap(firstItem);
-//
-//
-//                Menu menu = new Menu(menuVersion, formattedDateTime, tokenId,
-//                        dishes, drinks, addsOn, currentTimeMillis);
-//                menuCache.putMenu(cacheKey, menu, currentTimeMillis);
-//                return menu;
-//            }
-//        } catch (DynamoDbException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        return s3Service.loadFromS3();
-
-
 
         String cacheKey = "latestMenu";
-        long currentTimeMillis = System.currentTimeMillis();
-        String timestamString = Long.toString(currentTimeMillis);
 
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateTime = currentDateTime.format(formatter);
-
+        try{
+            Menu cachedMenu = menuCache.get(cacheKey);
+            if(cachedMenu != null){
+                return cachedMenu;
+            }
+        } catch (Exception e){
+            throw new RuntimeException("Error getting menu from cache: " + e.getMessage());
+        }
 
         try{
             Menu menu = menuRepository.getLatestMenuFromDatabase();
             if(menu != null){
-                //menuCache.putMenu(cacheKey, menu, currentTimeMillis);
-                Menu cachedMenu = menuCache.get(cacheKey);
-
-                return cachedMenu;
+                menuCache.put(cacheKey, menu);
+                return menu;
             }
 
         } catch (Exception e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error getting menu from database: " + e.getMessage());
         }
         return null;
     }
 
     public Menu loadLatestMenuFromCache() {
         String cacheKey = "latestMenu";
-        long currentTimeMillis = System.currentTimeMillis();
-        Menu cachedMenu = menuCache.get(cacheKey);
-//        Menu cachedMenu = menuCache.getMenu(cacheKey, currentTimeMillis);
 
-        try{
+        try {
+            Menu cachedMenu = menuCache.get(cacheKey);
             if (cachedMenu != null) {
                 return cachedMenu;
             }
-            Menu menu = menuRepository.getLatestMenuFromDatabase();
-            //to ponizej sprawdz
-            s3Uploader.uploadToS3(menu);
-            // i ze ma jeszcze do cache ladowac
-            menuCache.put(cacheKey, menu);
-            return menu;
+            cachedMenu = menuRepository.getLatestMenuFromDatabase();
 
-        } catch (Exception e){
+
+            if(cachedMenu != null){
+                s3Uploader.uploadToS3(cachedMenu);
+                menuCache.put(cacheKey, cachedMenu);
+
+                return cachedMenu;
+            }
+
+        } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public void scheduleCacheRefresh(){
+        scheduler.scheduleAtFixedRate(this::refreshCache, 0, 12, TimeUnit.HOURS);
+    }
+
+    public void refreshCache(){
+        String cacheKey = "latestMenu";
+        long currentTimeMillis = System.currentTimeMillis();
+        Menu latestMenu = menuRepository.getLatestMenuFromDatabase();
+        if(latestMenu != null){
+            menuCache.put(cacheKey, latestMenu);
+
         }
     }
 }

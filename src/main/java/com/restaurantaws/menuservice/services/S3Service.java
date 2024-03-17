@@ -6,6 +6,7 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
 public class S3Service {
 
+    //not use
     public void saveToS3(Menu menu){
         try{
             S3Uploader.uploadToS3(menu);
@@ -14,6 +15,7 @@ public class S3Service {
         }
     }
 
+    //not use
     public Menu loadFromS3(){
         String bucketName = "menudatabase-menu";
         String menuKey = "menu.json";

@@ -22,50 +22,15 @@ public class Menu {
         this.menuVersion = 1;
     }
 
-    public Menu(double menuVersion, String date, String token, List<Dish> dishes, List<Drink> drinks, List<AddOn> addsOn, long timestamp) {
+    public Menu(double menuVersion, String date, String token, List<Dish> dishes, List<Drink> drinks, List<AddOn> addsOn, Category category, long timestamp) {
         this.menuVersion = menuVersion;
         this.date = date;
         this.token = token;
         this.dishes = dishes;
         this.drinks = drinks;
         this.addsOn = addsOn;
+        this.category = category;
         this.timestamp = timestamp;
-    }
-    public Menu(String date, String token, List<Dish> dishes, List<Drink> drinks, List<AddOn> addsOn, long timestamp) {
-        this.menuVersion = 1.0;
-        this.date = date;
-        this.token = token;
-        this.dishes = dishes;
-        this.drinks = drinks;
-        this.addsOn = addsOn;
-        this.timestamp = timestamp;
-    }
-
-    @DynamoDBAttribute
-    public List<Dish> getDishes() {
-        return dishes;
-    }
-
-    public void setDishes(List<Dish> dishes) {
-        this.dishes = dishes;
-    }
-
-    @DynamoDBAttribute
-    public List<Drink> getDrinks() {
-        return drinks;
-    }
-
-    public void setDrinks(List<Drink> drinks) {
-        this.drinks = drinks;
-    }
-
-    @DynamoDBAttribute
-    public List<AddOn> getAddsOn() {
-        return addsOn;
-    }
-
-    public void setAddsOn(List<AddOn> addsOn) {
-        this.addsOn = addsOn;
     }
 
     @DynamoDBAttribute
@@ -96,6 +61,42 @@ public class Menu {
     }
 
     @DynamoDBAttribute
+    public List<Dish> getDishes() {
+        return dishes;
+    }
+
+    public void setDishes(List<Dish> dishes) {
+        this.dishes = dishes;
+    }
+
+    @DynamoDBAttribute
+    public List<Drink> getDrinks() {
+        return drinks;
+    }
+
+    public void setDrinks(List<Drink> drinks) {
+        this.drinks = drinks;
+    }
+
+    @DynamoDBAttribute
+    public List<AddOn> getAddsOn() {
+        return addsOn;
+    }
+
+    public void setAddsOn(List<AddOn> addsOn) {
+        this.addsOn = addsOn;
+    }
+
+    @DynamoDBAttribute
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    @DynamoDBAttribute
     public long getTimestamp() {
         return timestamp;
     }
@@ -108,14 +109,7 @@ public class Menu {
         this.menuVersion += 0.1;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
+    @Override
     public String toString() {
         return "Menu{" +
                 "menuVersion=" + menuVersion +
