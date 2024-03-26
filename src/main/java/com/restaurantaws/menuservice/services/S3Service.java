@@ -7,9 +7,9 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 public class S3Service {
 
     private S3Uploader s3Uploader;
-    private S3Downloader s3Downloader;
+    private S3DownloadInterface s3Downloader;
 
-    public S3Service(S3Uploader s3Uploader, S3Downloader s3Downloader) {
+    public S3Service(S3Uploader s3Uploader, S3DownloadInterface s3Downloader) {
         this.s3Uploader = s3Uploader;
         this.s3Downloader = s3Downloader;
     }

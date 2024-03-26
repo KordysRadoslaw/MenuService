@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-public class S3Downloader {
-    public static String downloadJsonFromS3(String bucketName, String key) {
+public class S3Downloader  implements S3DownloadInterface{
+    public String downloadJsonFromS3(String bucketName, String key) {
         S3Client s3Client = S3ClientFactory.createS3Client();
 
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
