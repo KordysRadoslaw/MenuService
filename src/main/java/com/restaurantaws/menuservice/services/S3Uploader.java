@@ -1,5 +1,8 @@
 package com.restaurantaws.menuservice.services;
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.google.gson.Gson;
 import com.restaurantaws.menuservice.model.Menu;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -8,6 +11,12 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 public class S3Uploader {
+
+    private final AmazonS3 s3Client;
+
+    public S3Uploader() {
+        this.s3Client = AmazonS3ClientBuilder.standard().withCredentials(DefaultAWSCredentialsProviderChain.getInstance()).build();
+    }
 
     private static final Gson gson = new Gson();
 

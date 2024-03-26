@@ -6,26 +6,34 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
 public class S3Service {
 
-    //not use
-    public void saveToS3(Menu menu){
-        try{
-            S3Uploader.uploadToS3(menu);
-        }catch (Exception e){
+    private S3Uploader s3Uploader;
+    private S3Downloader s3Downloader;
+
+    public S3Service(S3Uploader s3Uploader, S3Downloader s3Downloader) {
+        this.s3Uploader = s3Uploader;
+        this.s3Downloader = s3Downloader;
+    }
+
+    public void saveToS3(Menu menu) {
+        try {
+            s3Uploader.uploadToS3(menu);
+        } catch (Exception e) {
             throw new RuntimeException("Error while saving data to S3: " + e.getMessage());
         }
     }
 
     //not use
-    public Menu loadFromS3(){
+    public Menu loadFromS3() {
         String bucketName = "menudatabase-menu";
         String menuKey = "menu.json";
 
-        try{
-            String json = S3Downloader.downloadJsonFromS3(bucketName, menuKey);
+        try {
+            String json = s3Downloader.downloadJsonFromS3(bucketName, menuKey);
             Gson gson = new Gson();
             return gson.fromJson(json, Menu.class);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error while loading data from S3. Bucket: " + bucketName + ", Key: " + menuKey + ". " + e.getMessage());
         }
     }
+
 }

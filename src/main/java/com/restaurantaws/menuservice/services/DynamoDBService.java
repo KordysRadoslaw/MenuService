@@ -43,7 +43,6 @@ public class DynamoDBService {
     public boolean saveData(Menu menu){
         Menu formattedMenu = menuFormatter.formatMenu(menu);
         try{
-            //kurwa tu gdzies jest blad
             menuRepository.saveMenu(formattedMenu);
             s3Uploader.uploadToS3(formattedMenu);
             return true;

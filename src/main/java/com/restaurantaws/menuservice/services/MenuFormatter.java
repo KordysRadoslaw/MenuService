@@ -26,15 +26,25 @@ public class MenuFormatter {
         formattedMenu.setToken(tokenId);
         formattedMenu.setTimestamp(currentTimeMillis);
 
-        // the copy of the list is created to avoid modifying the original list
-        List<Dish> dishes = new ArrayList<>(menu.getDishes());
-        List<Drink> drinks = new ArrayList<>(menu.getDrinks());
-        List<AddOn> addsOn = new ArrayList<>(menu.getAddsOn());
+        if (menu.getDishes() != null) {
+            List<Dish> dishes = new ArrayList<>(menu.getDishes());
+            formattedMenu.setDishes(dishes);
+        }
 
-        // set the values of the original list to the formatted menu
-        formattedMenu.setDishes(dishes);
-        formattedMenu.setDrinks(drinks);
-        formattedMenu.setAddsOn(addsOn);
+        if (menu.getDrinks() != null) {
+            List<Drink> drinks = new ArrayList<>(menu.getDrinks());
+            formattedMenu.setDrinks(drinks);
+        }
+
+        if (menu.getAddsOn() != null) {
+            List<AddOn> addsOn = new ArrayList<>(menu.getAddsOn());
+            formattedMenu.setAddsOn(addsOn);
+        }
+
+        if(menu.getDishes() == null && menu.getDrinks() == null && menu.getAddsOn() == null){
+            //menu cannot be null
+            return null;
+        }
 
         return formattedMenu;
     }

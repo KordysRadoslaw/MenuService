@@ -57,7 +57,7 @@ public class MenuLambdaHandler implements RequestHandler<APIGatewayProxyRequestE
 
         this.menuDatabaseService = new DynamoDBService(dynamoDbClient, TABLE_NAME, asyncCache,
                 new MenuRepositoryImpl(new DynamoDB(amazonDynamoDBClient)), new MenuFormatter(),
-                new S3Service(), new S3Uploader(), new GenerateToken());
+                new S3Service(new S3Uploader(), new S3Downloader()), new S3Uploader(), new GenerateToken());
 
         this.generateToken = new GenerateToken();
         this.menuRepository = new MenuRepositoryImpl(new DynamoDB(amazonDynamoDBClient));

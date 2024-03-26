@@ -32,7 +32,6 @@ public class MenuRepositoryImpl implements MenuRepository {
     @Override
     public void saveMenu(Menu menu) {
 
-        //tutaj taki blad
         try {
             Item item = new Item();
             item.withPrimaryKey("menuVersion", menu.getMenuVersion())
