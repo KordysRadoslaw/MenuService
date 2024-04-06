@@ -21,7 +21,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * AWS Lambda handler for processing menu requests.
+ * This handler class handles incoming HTTP requests for managing menus.
+ */
 public class MenuLambdaHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private final DynamoDBService menuDatabaseService;
@@ -65,6 +68,12 @@ public class MenuLambdaHandler implements RequestHandler<APIGatewayProxyRequestE
     }
 
 
+    /**
+     * Handles incoming Lambda requests.
+     * @param apiGatewayProxyRequestEvent The Lambda Function input
+     * @param context The Lambda execution environment context object.
+     * @return APIGatewayProxyResponseEvent containing the response details.
+     */
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
         LambdaLogger logger = context.getLogger();
@@ -116,6 +125,12 @@ public class MenuLambdaHandler implements RequestHandler<APIGatewayProxyRequestE
         return response;
     }
 
+    /**
+     * Load menu from cache or database.
+     * @param apiGatewayProxyRequestEvent
+     * @param context
+     * @return APIGatewayProxyResponseEvent containing the response details.
+     */
     public APIGatewayProxyResponseEvent loadMenu(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
         LambdaLogger logger = context.getLogger();
         logger.log("received: " + apiGatewayProxyRequestEvent);
@@ -150,6 +165,12 @@ public class MenuLambdaHandler implements RequestHandler<APIGatewayProxyRequestE
         }
     }
 
+    /**
+     * Create an error response.
+     * @param status The HTTP status code.
+     * @param errorMessage The error message.
+     * @return APIGatewayProxyResponseEvent containing the error response.
+     */
     private APIGatewayProxyResponseEvent createErrorResponse(int status, String errorMessage){
         APIGatewayProxyResponseEvent errorResponse = new APIGatewayProxyResponseEvent();
         errorResponse.setStatusCode(status);

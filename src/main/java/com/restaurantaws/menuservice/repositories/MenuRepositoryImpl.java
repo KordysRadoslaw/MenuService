@@ -18,6 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * MenuRepository implementation for saving and retrieving menu data.
+ */
 public class MenuRepositoryImpl implements MenuRepository {
 
     private final Table menuTable;
@@ -29,6 +32,9 @@ public class MenuRepositoryImpl implements MenuRepository {
         this.menuTable = dynamodb.getTable("MenuTable");
     }
 
+    /**
+     * {inheritDoc}
+     */
     @Override
     public void saveMenu(Menu menu) {
 
@@ -51,6 +57,9 @@ public class MenuRepositoryImpl implements MenuRepository {
         }
     }
 
+    /**
+     * {inheritDoc}
+     */
     @Override
     public Menu getLatestMenuFromDatabase() {
         Iterator<Item> iterator = menuTable.scan(new ScanSpec().withMaxResultSize(1)).iterator();
@@ -64,12 +73,20 @@ public class MenuRepositoryImpl implements MenuRepository {
         return null;
     }
 
+    /**
+     * {inheritDoc}
+     */
     @Override
     public Menu getLatestMenuFromCache() {
         Menu menu = asyncCache.get("latestMenu");
         return menu;
     }
 
+    /**
+     * Converts an Item object to a Menu object.
+     * @param item
+     * @return
+     */
     private Menu toItem(Item item) {
         Menu menu = new Menu();
         menu.setMenuVersion(item.getDouble("menuVersion"));

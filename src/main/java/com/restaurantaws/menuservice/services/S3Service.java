@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 import com.restaurantaws.menuservice.model.Menu;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
+/**
+ * Service class for interacting with S3
+ */
 public class S3Service {
 
     private S3Uploader s3Uploader;
@@ -14,6 +17,10 @@ public class S3Service {
         this.s3Downloader = s3Downloader;
     }
 
+    /**
+     * Save menu to S3
+     * @param menu
+     */
     public void saveToS3(Menu menu) {
         try {
             s3Uploader.uploadToS3(menu);
@@ -23,6 +30,11 @@ public class S3Service {
     }
 
     //not use
+
+    /**
+     * Load menu from S3
+     * @return Menu object from saved json file
+     */
     public Menu loadFromS3() {
         String bucketName = "menudatabase-menu";
         String menuKey = "menu.json";

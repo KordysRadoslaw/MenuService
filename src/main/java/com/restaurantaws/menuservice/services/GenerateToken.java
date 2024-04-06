@@ -4,6 +4,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+/**
+ * GenerateToken class is used to generate a unique token.
+ */
 public class GenerateToken {
 
     public String generateUniqueToken() {

@@ -7,6 +7,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Service class for interacting with DynamoDB
+ */
 public class DynamoDBService {
 
 
@@ -51,6 +54,10 @@ public class DynamoDBService {
         }
     }
 
+    /**
+     * Loads the latest menu from the database
+     * @return Menu object containing the latest menu from the database
+     */
     public Menu loadLatestMenuFromDatabase() {
 
         String cacheKey = "latestMenu";
@@ -77,6 +84,11 @@ public class DynamoDBService {
         return null;
     }
 
+    /**
+     * Loads the latest menu from the cache
+     * @return Menu object containing the latest menu from the cache
+     */
+
     public Menu loadLatestMenuFromCache() {
         String cacheKey = "latestMenu";
 
@@ -101,6 +113,10 @@ public class DynamoDBService {
         return null;
     }
 
+    /**
+     * Schedules a cache refresh every 12 hours
+     * Refreshes the cache by getting the latest menu from the database
+     */
     public void scheduleCacheRefresh(){
         scheduler.scheduleAtFixedRate(this::refreshCache, 0, 12, TimeUnit.HOURS);
     }

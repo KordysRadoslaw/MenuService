@@ -10,6 +10,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
+/**
+ * This class is responsible for uploading the menu to S3
+ */
 public class S3Uploader {
 
     private final AmazonS3 s3Client;
@@ -19,6 +22,11 @@ public class S3Uploader {
     }
 
     private static final Gson gson = new Gson();
+
+    /**
+     * Uploads the menu to S3
+     * @param menu the menu to upload
+     */
 
     public static void uploadToS3(Menu menu){
         String bucketName = "menudatabase-menu";

@@ -4,6 +4,10 @@ import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsPro
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+/**
+ * Factory class to create an S3 client
+
+ */
 public class S3ClientFactory {
     public static S3Client createS3Client() {
         return S3Client.builder()

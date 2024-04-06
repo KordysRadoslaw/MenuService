@@ -6,6 +6,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Formats the menu to make sure it has all the required fields and make easily to generate a a jason in next steps
+ */
 public class MenuFormatter {
     private final GenerateToken generateToken = new GenerateToken();
 
